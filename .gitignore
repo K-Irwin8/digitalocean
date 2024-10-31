@@ -1,0 +1,27 @@
+# Ignore virtual environments
+venv/
+env/
+newvenv/
+
+# Ignore compiled Python files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Ignore Docker and AWS-specific files
+#Dockerfile
+#.dockerignore
+.elasticbeanstalk/
+.ebextensions/
+AWSCLIV2.pkg
+#Procfile
+
+# Ignore environment variables
+.env
+
+# Ignore uploads, static files, and temporary files
+uploads/
+static/
+*.log
+
+
