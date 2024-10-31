@@ -26,6 +26,9 @@ COPY static/ static/
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# **Add this step to download the Whisper model during the build**
+RUN python -c "import whisper; whisper.load_model('small')"
+
 # Copy the rest of the application code
 #COPY . .
 
