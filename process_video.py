@@ -17,6 +17,9 @@ from openai import OpenAI
 api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
 
+if not api_key:
+    raise ValueError("API key is not set. Please set the OPENAI_API_KEY environment variable.")
+
 
 # Your existing functions with minimal changes
 def extract_audio(video_file, audio_file):
