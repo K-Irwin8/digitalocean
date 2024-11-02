@@ -6,6 +6,16 @@ import threading
 import os
 from process_video import main as process_video
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+# Add an error handler to capture unhandled exceptions
+@app.errorhandler(Exception)
+def handle_exception(e):
+    logging.exception("An error occurred: %s", e)
+    return "Internal Server Error", 500
+
 app = Flask(__name__)
 #CORS(app)
 CORS(app, resources={r"/*": {"origins": ["https://trustvideotranslate.com"]}})
@@ -45,6 +55,7 @@ def send_email(recipient, download_link):
 #TEST
 @app.route('/', methods=['GET'])
 def home():
+    logging.info("Home route accessed")
     return "Hello, your Flask app is running on AWS Elastic Beanstalk!"
 
 
@@ -87,6 +98,7 @@ def upload():
         return jsonify({'error': 'Invalid file type'}), 400
 
 def process_video_task(input_video_path, output_video_path, source_language, target_language, title, email):
+    logging.info("Starting video processing task")
     try:
         # Call your existing video translation code
         process_video(
