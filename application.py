@@ -111,7 +111,7 @@ def process_video_task(input_video_path, output_video_path, source_language, tar
 
 
         # Generate a download link
-        download_link = f"https://your-heroku-app-name.herokuapp.com/translated_videos/{os.path.basename(output_video_path)}"
+        download_link = f"https://api.trustvideotranslate.com/{os.path.basename(output_video_path)}"
 
         # Send email notification
         #send_email(email, download_link)
