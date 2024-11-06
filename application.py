@@ -18,7 +18,7 @@ def handle_exception(e):
 
 app = Flask(__name__)
 #CORS(app)
-CORS(app, resources={r"/*": {"origins": ["https://trustvideotranslate.com"]}})
+CORS(app, resources={r"/*": {"origins": ["https://trustvideotranslate.com", "https://api.trustvideotranslate.com"]}})
 #CORS(app, resources={r"/*": {"origins": ["https://trustvideotranslate.com/translate"]}})
 #TEST
 
