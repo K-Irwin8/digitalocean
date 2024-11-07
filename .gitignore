@@ -9,8 +9,9 @@ __pycache__/
 *.pyo
 
 # Ignore Docker and AWS-specific files
-#Dockerfile
-#.dockerignore
+docker_images/
+Dockerfile
+.dockerignore
 .elasticbeanstalk/
 .ebextensions/
 AWSCLIV2.pkg
