@@ -3,7 +3,7 @@
 # Import necessary libraries
 import whisper
 import moviepy.editor as mp
-import moviepy.config as mpconf
+import moviepy.config as mpconfig
 mpconfig.FFMPEG_BINARY = './bin/ffmpeg'
 from moviepy.video.tools.subtitles import SubtitlesClip
 import pysrt
