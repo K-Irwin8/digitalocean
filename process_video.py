@@ -31,8 +31,9 @@ def extract_audio(video_file, audio_file):
         print(f"Audio file '{audio_file}' already exists. Skipping extraction.")
 
 # Load the Whisper model
-whisper_cache_dir = os.getenv('WHISPER_CACHE_DIR', '/app/.cache')
-model = whisper.load_model('small', download_root=whisper_cache_dir)
+# whisper_cache_dir = os.getenv('WHISPER_CACHE_DIR', '/app/.cache')
+# model = whisper.load_model('small', download_root=whisper_cache_dir)
+model = whisper.load_model('small')
 
 def transcribe_audio(audio_file, source_language, model_size='small'):
     
