@@ -2,7 +2,7 @@ name: sea-turtle-app
 services:
   - name: web
     git:
-      repo_clone_url: https://github.com/yourusername/your-repo.git
+      repo_clone_url: https://github.com/K-Irwin8/digitalocean.git
     env: python
     buildpacks:
       - url: https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git
