@@ -10,17 +10,17 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-# Add an error handler to capture unhandled exceptions
-@app.errorhandler(Exception)
-def handle_exception(e):
-    logging.exception("An error occurred: %s", e)
-    return "Internal Server Error", 500
-
 app = Flask(__name__)
 #CORS(app)
 CORS(app, resources={r"/*": {"origins": ["https://trustvideotranslate.com", "https://api.trustvideotranslate.com"]}})
 #CORS(app, resources={r"/*": {"origins": ["https://trustvideotranslate.com/translate"]}})
 #TEST
+
+# Add an error handler to capture unhandled exceptions
+@app.errorhandler(Exception)
+def handle_exception(e):
+    logging.exception("An error occurred: %s", e)
+    return "Internal Server Error", 500
 
 # Configuration
 app.config['UPLOAD_FOLDER'] = 'uploads'
