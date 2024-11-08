@@ -123,7 +123,7 @@ def embed_subtitles(video_file, srt_file, output_file):
         fontsize=48,
         color='white',
         # bg_color='black', 
-        method='caption',
+        method='label',# Change 'caption' to 'label' or 'text'
         size=(video_width, None),  # Adjust size as needed
         align='center',
         interline=-10,
