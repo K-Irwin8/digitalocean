@@ -1,13 +1,14 @@
 # video_translation.py
 
 # Import necessary libraries
+import os
+os.environ['FFMPEG_BINARY'] = './bin/ffmpeg'
 import whisper
 import moviepy.editor as mp
-import moviepy.config as mpconfig
-mpconfig.FFMPEG_BINARY = './bin/ffmpeg'
+# import moviepy.config as mpconfig
+# mpconfig.FFMPEG_BINARY = './bin/ffmpeg'
 from moviepy.video.tools.subtitles import SubtitlesClip
 import pysrt
-import os
 from dotenv import load_dotenv
 from openai import OpenAI
 
