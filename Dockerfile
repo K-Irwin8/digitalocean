@@ -18,9 +18,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpulse0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Verify ImageMagick installation and modify policy.xml
-RUN ls /etc/ImageMagick-6/ && \
-    sed -i '/<policy domain="path" rights="none" pattern="@*"/>/ s/^#*/#/' /etc/ImageMagick-6/policy.xml
+# Verify ImageMagick installation and locate policy.xml
+RUN imagemagick --version && find /etc -name "policy.xml"
+
+# Modify ImageMagick's policy.xml to allow @ paths
+RUN sed -i '/<policy domain="path" rights="none" pattern="@*"/>/ s/^#*/#/' /etc/ImageMagick-6/policy.xml
+
+# Verify the modification
+RUN grep '<policy domain="path" rights="none" pattern="@*"/>' /etc/ImageMagick-6/policy.xml && echo "ImageMagick policy modified successfully."
 
 # Set the working directory in the container
 WORKDIR /app
