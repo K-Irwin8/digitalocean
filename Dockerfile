@@ -7,6 +7,8 @@ ENV XDG_CACHE_HOME=/app/.cache
 ENV FFMPEG_BINARY=/usr/bin/ffmpeg
 ENV PATH="/usr/bin:${PATH}"
 
+RUN cat /etc/ImageMagick-6/policy.xml
+
 # Install necessary system packages and dependencies for ImageMagick
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
