@@ -119,11 +119,11 @@ def embed_subtitles(video_file, srt_file, output_file):
     # Generate a subtitles clip
     generator = lambda txt: mp.TextClip(
         txt,
-        font='Helvetica',  # Use 'Arial' if 'Helvetica' isn't available #.Hiragino-Kaku-Gothic-Interface-W0 is available for japanese and english characters
+        font='Arial',  # Use 'Arial' if 'Helvetica' isn't available #.Hiragino-Kaku-Gothic-Interface-W0 is available for japanese and english characters
         fontsize=48,
         color='white',
         # bg_color='black', 
-        method='label',# Change 'caption' to 'label' or 'text'
+        method='text',# Change 'caption' to 'label' or 'text'
         size=(video_width, None),  # Adjust size as needed
         align='center',
         interline=-10,
