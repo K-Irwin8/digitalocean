@@ -10,7 +10,8 @@ __pycache__/
 
 # Ignore Docker and AWS-specific files
 docker_images/
-Dockerfile
+#Dockerfile
+DockerfileOLD
 .dockerignore
 .elasticbeanstalk/
 .ebextensions/
