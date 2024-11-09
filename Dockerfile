@@ -4,8 +4,8 @@ FROM python:3.12-slim-bullseye
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV XDG_CACHE_HOME=/app/.cache  
-ENV FFMPEG_BINARY=/bin/ffmpeg
-ENV PATH="/bin:${PATH}"
+ENV FFMPEG_BINARY=/usr/bin/ffmpeg
+ENV PATH="/usr/bin:${PATH}"
 
 # Install necessary system packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -22,10 +22,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN imagemagick --version && find /etc -name "policy.xml"
 
 # Modify ImageMagick's policy.xml to allow @ paths
-RUN sed -i '/<policy domain="path" rights="none" pattern="@*"/>/ s/^#*/#/' /etc/ImageMagick-6/policy.xml
+RUN sed -i '/pattern="@*"/ s/^/#/' /etc/ImageMagick-6/policy.xml
 
 # Verify the modification
-RUN grep '<policy domain="path" rights="none" pattern="@*"/>' /etc/ImageMagick-6/policy.xml && echo "ImageMagick policy modified successfully."
+RUN grep '^#.*pattern="@*"' /etc/ImageMagick-6/policy.xml && echo "ImageMagick policy modified successfully."
 
 # Set the working directory in the container
 WORKDIR /app
@@ -49,7 +49,7 @@ COPY static/ static/
 COPY fonts/ fonts/
 
 # Ensure FFmpeg has execute permissions
-RUN chmod +x /bin/ffmpeg
+# No need to chmod /usr/bin/ffmpeg as it's already executable
 
 # Change ownership of the app directory
 RUN chown -R appuser:appuser /app
