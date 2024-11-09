@@ -7,25 +7,37 @@ ENV XDG_CACHE_HOME=/app/.cache
 ENV FFMPEG_BINARY=/usr/bin/ffmpeg
 ENV PATH="/usr/bin:${PATH}"
 
-# Install necessary system packages
+# Install necessary system packages and dependencies for ImageMagick
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
-    imagemagick \
     ffmpeg \
     libsm6 \
     libxext6 \
     libgl1-mesa-glx \
     libpulse0 \
+    build-essential \
+    libmagick++-dev \
+    fonts-liberation \
+    sox \
+    bc \
+    gsfonts \
     && rm -rf /var/lib/apt/lists/*
 
-# Verify ImageMagick installation and locate policy.xml
-RUN imagemagick --version && find /etc -name "policy.xml"
+# Install ImageMagick from source for better compatibility
+RUN mkdir -p /tmp/distr && \
+    cd /tmp/distr && \
+    wget https://download.imagemagick.org/ImageMagick/download/releases/ImageMagick-7.0.11-2.tar.xz && \
+    tar xvf ImageMagick-7.0.11-2.tar.xz && \
+    cd ImageMagick-7.0.11-2 && \
+    ./configure --enable-shared=yes --disable-static --without-perl && \
+    make && \
+    make install && \
+    ldconfig /usr/local/lib && \
+    cd /tmp && \
+    rm -rf distr
 
 # Modify ImageMagick's policy.xml to allow @ paths
-RUN sed -i '/pattern="@*"/ s/^/#/' /etc/ImageMagick-6/policy.xml
-
-# Verify the modification
-RUN grep '^#.*pattern="@*"' /etc/ImageMagick-6/policy.xml && echo "ImageMagick policy modified successfully."
+RUN sed -i 's/<policy domain="path" rights="none" pattern="@\*"\/>/<\!-- & -->/' /etc/ImageMagick-6/policy.xml
 
 # Set the working directory in the container
 WORKDIR /app
@@ -47,9 +59,6 @@ COPY static/ static/
 
 # Copy fonts if using custom fonts
 COPY fonts/ fonts/
-
-# Ensure FFmpeg has execute permissions
-# No need to chmod /usr/bin/ffmpeg as it's already executable
 
 # Change ownership of the app directory
 RUN chown -R appuser:appuser /app
