@@ -8,6 +8,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Construct the absolute path to the ffmpeg binary
 ffmpeg_binary = '/usr/bin/ffmpeg'  # Updated path
+#ffmpeg_binary = os.path.join(current_dir, 'bin', 'ffmpeg')
 
 # Set FFMPEG_BINARY to the absolute path of the ffmpeg binary
 os.environ['FFMPEG_BINARY'] = ffmpeg_binary
