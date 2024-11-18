@@ -16,18 +16,35 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxext6 \
     libgl1-mesa-glx \
     libpulse0 \
-    && rm -rf /var/lib/apt/lists/*
+    xz-utils \
+    && rm -rf /var/lib/apt/lists/* && \
+    which ffmpeg && ffmpeg -version || echo "FFmpeg installation failed"
 
-# Verify ImageMagick installation and locate policy.xml
-RUN imagemagick --version && find /etc -name "policy.xml"
+# Download and install FFmpeg static binary
+RUN wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz \
+    && tar -xvf ffmpeg-release-amd64-static.tar.xz \
+    && mv ffmpeg-*-amd64-static/ffmpeg /bin/ \
+    && mv ffmpeg-*-amd64-static/ffprobe /bin/ \
+    && chmod +x /bin/ffmpeg /bin/ffprobe \
+    && rm -rf ffmpeg-*-amd64-static ffmpeg-release-amd64-static.tar.xz
 
-# Modify ImageMagick's policy.xml to allow @ paths
-RUN sed -i '/<policy domain="path" rights="none" pattern="@*"/>/ s/^#*/#/' /etc/ImageMagick-6/policy.xml
+RUN which ffmpeg && ffmpeg -version || echo "FFmpeg not found"
+RUN find / -type f -name ffmpeg || echo "FFmpeg binary not found"
 
-# Verify the modification
-RUN grep '<policy domain="path" rights="none" pattern="@*"/>' /etc/ImageMagick-6/policy.xml && echo "ImageMagick policy modified successfully."
+# Backup the original policy.xml (if it exists)
+RUN cp /etc/ImageMagick-6/policy.xml /etc/ImageMagick-6/policy.xml.bak || echo "No original file to back up"
 
-# Set the working directory in the container
+# Replace policy.xml with a controlled version
+RUN echo '<?xml version="1.0" encoding="UTF-8"?> \
+<!DOCTYPE policymap SYSTEM "http://www.imagemagick.org/script/policy.xml"> \
+<policymap> \
+<policy domain="path" rights="read|write" pattern="@*" /> \
+</policymap>' > /etc/ImageMagick-6/policy.xml
+
+# Debugging: Confirm the content of policy.xml
+RUN echo "Debugging policy.xml content:" && cat /etc/ImageMagick-6/policy.xml || echo "policy.xml not found or cannot be read"
+
+# Set the working directory
 WORKDIR /app
 
 # Create a non-root user and group
@@ -44,9 +61,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy remaining application code
 COPY templates/ templates/
 COPY static/ static/
-
-# Copy fonts if using custom fonts
-COPY fonts/ fonts/
 
 # Ensure FFmpeg has execute permissions
 RUN chmod +x /bin/ffmpeg
