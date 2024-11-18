@@ -26,6 +26,17 @@ else:
 from moviepy.config import change_settings 
 IMAGEMAGICK_BINARY = "/usr/bin/convert"  # Replace with the actual path from `which convert`
 change_settings({"IMAGEMAGICK_BINARY": IMAGEMAGICK_BINARY})
+# testing if convert binary can be used. DELETE once confirmed
+from moviepy.editor import TextClip
+
+try:
+    text = TextClip("Hello World", fontsize=50, color="white", font="Arial", method="text")
+    text.save_frame("/tmp/test_frame.png")
+    print("TextClip successfully used ImageMagick!")
+except Exception as e:
+    print(f"Error using TextClip: {e}")
+    
+print(f"IMAGEMAGICK_BINARY is set to: {IMAGEMAGICK_BINARY}")
 
   
 import whisper
