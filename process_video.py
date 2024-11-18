@@ -20,7 +20,14 @@ if not os.path.exists(ffmpeg_binary):
     print(f"FFmpeg binary not found at {ffmpeg_binary}")
 else:
     print(f"FFmpeg binary found at {ffmpeg_binary}")
-    
+ 
+ 
+# for imagemagick path settings 
+from moviepy.config import change_settings 
+IMAGEMAGICK_BINARY = "/usr/bin/convert"  # Replace with the actual path from `which convert`
+change_settings({"IMAGEMAGICK_BINARY": IMAGEMAGICK_BINARY})
+
+  
 import whisper
 import moviepy.editor as mp
 #import ffmpeg
