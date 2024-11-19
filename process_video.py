@@ -128,49 +128,58 @@ def write_srt(translated_segments, srt_file):
     # Save to SRT file
     subs.save(srt_file, encoding='utf-8')
 
-def embed_subtitles(video_file, srt_file, output_file):
-    # Load video clip
-    clip = mp.VideoFileClip(video_file)
-    video_width, video_height = clip.size  # Get the video dimensions
-    print(f"Video dimensions: width={video_width}, height={video_height}")
+# Step 5: Generate Subtitle Images with Pillow
+def generate_subtitle_image(txt, video_width):
+    import os
+    from PIL import Image, ImageDraw, ImageFont
 
-    # Generate a subtitles clip
-    generator = lambda txt: mp.TextClip(
+    # Use a bundled font file
+    font_path = os.path.join(os.path.dirname(__file__), "fonts", "NotoSansJP-VariableFont_wght.ttf")
+    font = ImageFont.truetype(font_path, size=48)  # Font size 48
+
+    # Calculate text size using textbbox
+    text_bbox = font.getbbox(txt)
+    text_width = text_bbox[2] - text_bbox[0]
+    text_height = text_bbox[3] - text_bbox[1]
+
+    # Create an image with a semi-transparent black background
+    img = Image.new("RGBA", (video_width, text_height + 40), (0, 0, 0, 200))  # Background color with alpha
+    draw = ImageDraw.Draw(img)
+    
+    # Draw the text on the image
+    draw.text(
+        ((video_width - text_width) // 2, 20),  # Center the text horizontally
         txt,
-        font='Arial',  # Use 'Arial' if 'Helvetica' isn't available #.Hiragino-Kaku-Gothic-Interface-W0 is available for japanese and english characters
-        fontsize=48,
-        color='white',
-        # bg_color='black', 
-        method='text',# Change 'caption' to 'label' or 'text'
-        size=(video_width, None),  # Adjust size as needed
-        align='center',
-        interline=-10,
-        transparent=True
+        font=font,
+        fill="white"  # Text color
     )
+    
+    # Save the image to a temporary file
+    temp_file = f"temp_subtitle_{time.time()}.png"
+    img.save(temp_file)
+    return temp_file
 
-    subtitles = SubtitlesClip(srt_file, generator)
 
-    # Overlay subtitles onto the video
-    result = mp.CompositeVideoClip(
-        [clip, subtitles.set_position(('center', 'bottom'))],
-        size=clip.size
-    )
-
-    # Include the original audio track
-    result.audio = clip.audio
-
-    # Write the result to a file
-    result.write_videofile(
-        output_file,
-        codec='libx264',
-        audio_codec='aac',
-        temp_audiofile='temp-audio.m4a',
-        remove_temp=True
-    )
-
-    # Close clips
-    clip.close()
-    result.close()
+# Step 6: Embed Subtitles into the Video
+def embed_subtitles(video_file, srt_file, output_file):
+    clip = mp.VideoFileClip(video_file)
+    video_width, _ = clip.size
+    
+    subtitles = []
+    srt = pysrt.open(srt_file, encoding='utf-8')
+    
+    for sub in srt:
+        subtitle_image_path = generate_subtitle_image(sub.text, video_width)
+        subtitle_clip = (
+            mp.ImageClip(subtitle_image_path)
+            .set_start(sub.start.ordinal / 1000)  # Convert ms to seconds
+            .set_duration((sub.end.ordinal - sub.start.ordinal) / 1000)  # Duration in seconds
+            .set_position(('center', 'bottom'))
+        )
+        subtitles.append(subtitle_clip)
+    
+    final_clip = mp.CompositeVideoClip([clip] + subtitles)
+    final_clip.write_videofile(output_file, codec='libx264', audio_codec='aac')
 
 # Main Execution function accepting parameters
 def main(input_video_path, output_video_file, source_language, target_language, title):
