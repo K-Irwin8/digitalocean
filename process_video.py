@@ -132,6 +132,7 @@ def write_srt(translated_segments, srt_file):
 def generate_subtitle_image(txt, video_width):
     import os
     from PIL import Image, ImageDraw, ImageFont
+    import time
 
     # Use a bundled font file
     font_path = os.path.join(os.path.dirname(__file__), "fonts", "NotoSansJP-VariableFont_wght.ttf")
