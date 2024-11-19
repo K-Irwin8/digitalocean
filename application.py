@@ -111,7 +111,7 @@ def process_video_task(input_video_path, output_video_path, source_language, tar
 
 
         # Generate a download link
-        download_link = f"https://api.trustvideotranslate.com/{os.path.basename(output_video_path)}"
+        download_link = f"https://api.trustvideotranslate.com/static/translated_videos/{os.path.basename(output_video_path)}"
 
         # Send email notification
         #send_email(email, download_link)
@@ -123,8 +123,8 @@ def process_video_task(input_video_path, output_video_path, source_language, tar
     except Exception as e:
         print(f"Error processing video: {e}")
 
-@app.route('/translated_videos/<filename>')
-def translated_videos(filename):
+@app.route('/static/translated_videos/<path:filename>')
+def serve_translated_videos(filename):
     return send_from_directory(app.config['TRANSLATED_FOLDER'], filename)
 
 if __name__ == '__main__':
