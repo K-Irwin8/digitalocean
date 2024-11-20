@@ -144,7 +144,7 @@ def generate_subtitle_image(txt, video_width):
     text_height = text_bbox[3] - text_bbox[1]
 
     # Create an image with a semi-transparent black background
-    img = Image.new("RGBA", (video_width, text_height + 40), (0, 0, 0, 200))  # Background color with alpha
+    img = Image.new("RGBA", (video_width, text_height + 40), (0, 0, 0, 0))  # Background color with alpha
     draw = ImageDraw.Draw(img)
     
     # Draw the text on the image

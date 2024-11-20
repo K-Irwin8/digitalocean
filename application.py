@@ -49,7 +49,7 @@ def send_email(recipient, download_link):
     msg = Message('Your Translated Video is Ready',
                   sender='your_email@example.com',
                   recipients=[recipient])
-    msg.body = f"Hello,\n\nYour translated video is ready. You can download it from the following link:\n{download_link}\n\nThank you!"
+    msg.body = f"こんにちは,\n\n翻訳動画が完成いたしました。 以下のリンクからダウンロードできます:\n{download_link}\n\nありがとうございました！\n\nTrust動画翻訳チーム一同"
     mail.send(msg)
 
 #TEST
