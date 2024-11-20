@@ -60,7 +60,6 @@ def home():
 
 
 @app.route('/upload', methods=['POST'])
-#@app.route('/translate', methods=['POST'])
 def upload():
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
@@ -75,7 +74,8 @@ def upload():
         return jsonify({'error': 'No selected file'}), 400
 
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
+        # Secure the file name and replace spaces with hyphens
+        filename = secure_filename(file.filename.replace(" ", "-"))
         input_video_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(input_video_path)
 
