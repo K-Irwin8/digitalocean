@@ -130,31 +130,48 @@ def write_srt(translated_segments, srt_file):
 
 # Step 5: Generate Subtitle Images with Pillow
 def generate_subtitle_image(txt, video_width):
-    import os
     from PIL import Image, ImageDraw, ImageFont
-    import time
+    import os
 
-    # Use a bundled font file
+    # Load the font
     font_path = os.path.join(os.path.dirname(__file__), "fonts", "NotoSansJP-VariableFont_wght.ttf")
     font = ImageFont.truetype(font_path, size=48)  # Font size 48
 
-    # Calculate text size using textbbox
+    # Get text dimensions
     text_bbox = font.getbbox(txt)
     text_width = text_bbox[2] - text_bbox[0]
     text_height = text_bbox[3] - text_bbox[1]
 
-    # Create an image with a semi-transparent black background
-    img = Image.new("RGBA", (video_width, text_height + 40), (0, 0, 0, 0))  # Background color with alpha
+    # Create a transparent image
+    img = Image.new("RGBA", (video_width, text_height + 40), (0, 0, 0, 0))
+
     draw = ImageDraw.Draw(img)
-    
-    # Draw the text on the image
-    draw.text(
-        ((video_width - text_width) // 2, 20),  # Center the text horizontally
-        txt,
-        font=font,
-        fill="white"  # Text color
-    )
-    
+
+    # Simulating bold text by drawing the same text multiple times (slight offset)
+    bold_offset = 1  # Adjust for more or less boldness
+
+    # Adding a black outline around the text
+    outline_offset = 2  # Thickness of the outline
+    for x in range(-outline_offset, outline_offset + 1):
+        for y in range(-outline_offset, outline_offset + 1):
+            if x != 0 or y != 0:  # Avoid overwriting the center with black
+                draw.text(
+                    ((video_width - text_width) // 2 + x, 20 + y),
+                    txt,
+                    font=font,
+                    fill="black"  # Black outline
+                )
+
+    # Draw the white text in the center to simulate boldness
+    for x in range(-bold_offset, bold_offset + 1):
+        for y in range(-bold_offset, bold_offset + 1):
+            draw.text(
+                ((video_width - text_width) // 2 + x, 20 + y),
+                txt,
+                font=font,
+                fill="white"  # White text
+            )
+
     # Save the image to a temporary file
     temp_file = f"temp_subtitle_{time.time()}.png"
     img.save(temp_file)
