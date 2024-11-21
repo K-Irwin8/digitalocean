@@ -127,6 +127,7 @@ def write_srt(translated_segments, srt_file):
         subs.append(sub)
     # Save to SRT file
     subs.save(srt_file, encoding='utf-8')
+    print(f"SRT file written to: {srt_file}") 
 
 # Step 5: Generate Subtitle Images with Pillow
 def generate_subtitle_image(txt, video_width):

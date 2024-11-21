@@ -102,14 +102,18 @@ def process_video_task(input_video_path, output_video_path, source_language, tar
         video_filename = os.path.basename(output_video_path)
         video_download_link = f"https://api.trustvideotranslate.com/static/translated_videos/{video_filename}"
 
-        # Move the SRT file to the translated folder
-        srt_filename = os.path.splitext(video_filename)[0] + ".srt"
-        srt_file_path = os.path.splitext(input_video_path)[0] + ".srt"  # Match the logic in process_video.py
+        # SRT file path logic
+        srt_file_path = os.path.splitext(input_video_path)[0] + ".srt"  # Match logic in process_video.py
+        print(f"Looking for SRT file at: {srt_file_path}")  # Debugging log
+
         if os.path.exists(srt_file_path):
-            translated_srt_path = os.path.join(app.config['TRANSLATED_FOLDER'], srt_filename)
+            translated_srt_path = os.path.join(app.config['TRANSLATED_FOLDER'], os.path.basename(srt_file_path))
             os.rename(srt_file_path, translated_srt_path)
-            srt_download_link = f"https://api.trustvideotranslate.com/static/translated_videos/{srt_filename}"
+            srt_download_link = f"https://api.trustvideotranslate.com/static/translated_videos/{os.path.basename(translated_srt_path)}"
         else:
+            # Debug existing SRT files for troubleshooting
+            existing_srt_files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.endswith('.srt')]
+            print("Existing SRT files:", existing_srt_files)
             srt_download_link = None
             logging.warning("SRT file not found for video: %s", input_video_path)
 
@@ -119,6 +123,7 @@ def process_video_task(input_video_path, output_video_path, source_language, tar
 
     except Exception as e:
         logging.error("Error processing video: %s", e)
+
 
 def send_email(recipient, video_download_link, srt_download_link=None):
     msg = Message(
