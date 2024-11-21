@@ -104,7 +104,7 @@ def process_video_task(input_video_path, output_video_path, source_language, tar
 
         # Move the SRT file to the translated folder
         srt_filename = os.path.splitext(video_filename)[0] + ".srt"
-        srt_file_path = os.path.join(app.config['UPLOAD_FOLDER'], srt_filename)
+        srt_file_path = os.path.splitext(input_video_path)[0] + ".srt"  # Match the logic in process_video.py
         if os.path.exists(srt_file_path):
             translated_srt_path = os.path.join(app.config['TRANSLATED_FOLDER'], srt_filename)
             os.rename(srt_file_path, translated_srt_path)

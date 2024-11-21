@@ -231,8 +231,8 @@ def main(input_video_path, output_video_file, source_language, target_language, 
     # Clean up temporary files
     if os.path.exists(audio_file):
         os.remove(audio_file)
-    if os.path.exists(srt_file):
-        os.remove(srt_file)
+    # if os.path.exists(srt_file):
+    #     os.remove(srt_file)
 
 # This allows the script to be run independently for testing
 if __name__ == "__main__":
