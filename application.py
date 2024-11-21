@@ -11,12 +11,9 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
-#CORS(app)
 CORS(app, resources={r"/*": {"origins": ["https://trustvideotranslate.com", "https://api.trustvideotranslate.com"]}})
-#CORS(app, resources={r"/*": {"origins": ["https://trustvideotranslate.com/translate"]}})
-#TEST
 
-# Add an error handler to capture unhandled exceptions
+# Error handler for unhandled exceptions
 @app.errorhandler(Exception)
 def handle_exception(e):
     logging.exception("An error occurred: %s", e)
@@ -45,19 +42,11 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
-def send_email(recipient, download_link):
-    msg = Message('Your Translated Video is Ready',
-                  sender='your_email@example.com',
-                  recipients=[recipient])
-    msg.body = f"こんにちは,\n\n翻訳動画が完成いたしました。 以下のリンクからダウンロードできます:\n{download_link}\n\nありがとうございました！\n\nTrust動画翻訳チーム一同"
-    mail.send(msg)
-
-#TEST
+# Main route
 @app.route('/', methods=['GET'])
 def home():
     logging.info("Home route accessed")
-    return "Hello, your Flask app is running on AWS Elastic Beanstalk!"
-
+    return "Hello, your Flask app is running!"
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -109,19 +98,44 @@ def process_video_task(input_video_path, output_video_path, source_language, tar
             title=title
         )
 
+        # Generate a download link for the video
+        video_filename = os.path.basename(output_video_path)
+        video_download_link = f"https://api.trustvideotranslate.com/static/translated_videos/{video_filename}"
 
-        # Generate a download link
-        download_link = f"https://api.trustvideotranslate.com/static/translated_videos/{os.path.basename(output_video_path)}"
+        # Move the SRT file to the translated folder
+        srt_filename = os.path.splitext(video_filename)[0] + ".srt"
+        srt_file_path = os.path.join(app.config['UPLOAD_FOLDER'], srt_filename)
+        if os.path.exists(srt_file_path):
+            translated_srt_path = os.path.join(app.config['TRANSLATED_FOLDER'], srt_filename)
+            os.rename(srt_file_path, translated_srt_path)
+            srt_download_link = f"https://api.trustvideotranslate.com/static/translated_videos/{srt_filename}"
+        else:
+            srt_download_link = None
+            logging.warning("SRT file not found for video: %s", input_video_path)
 
         # Send email notification
-        #send_email(email, download_link)
         with app.app_context():
-            # Send email notification
-            send_email(email, download_link)
-            print(f"Processing completed for video '{input_video_path}'. Email sent to '{email}'.")
-            
+            send_email(email, video_download_link, srt_download_link)
+
     except Exception as e:
-        print(f"Error processing video: {e}")
+        logging.error("Error processing video: %s", e)
+
+def send_email(recipient, video_download_link, srt_download_link=None):
+    msg = Message(
+        'Your Translated Video and Subtitles are Ready',
+        sender='traccoon1999@gmail.com',
+        recipients=[recipient]
+    )
+    msg.body = (
+        f"こんにちは,\n\n翻訳動画が完成いたしました。以下のリンクからダウンロードできます:\n\n"
+        f"動画: {video_download_link}\n"
+    )
+    if srt_download_link:
+        msg.body += f"字幕ファイル: {srt_download_link}\n"
+    else:
+        msg.body += "字幕ファイルが生成されませんでした。\n"
+    msg.body += "\nありがとうございました！\n\nTrust動画翻訳チーム一同"
+    mail.send(msg)
 
 @app.route('/static/translated_videos/<path:filename>')
 def serve_translated_videos(filename):
@@ -130,6 +144,3 @@ def serve_translated_videos(filename):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
     app.run(host='0.0.0.0', port=port)
-    #port = int(os.getenv('PORT', 5001))
-    #host = os.getenv('HOST', '0.0.0.0')
-    #app.run(host=host, port=port)
